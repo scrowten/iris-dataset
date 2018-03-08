@@ -17,7 +17,7 @@ prediciton_result = []
 
 #read data from csv
 def readData():
-	with open('irisdatatraining.csv') as openCsv:
+	with open('irisdataholdout.csv') as openCsv:
 		data = csv.reader(openCsv)
 		for row in range(data):
 			x.append([float(row[0]), float(row[1]), float(row[0]), float(row[3])])
@@ -69,7 +69,7 @@ def start_training():
 
 def start_validation():
 	for i in range(20):
-		
+
 
 
 readData()
