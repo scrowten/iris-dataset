@@ -4,71 +4,91 @@ import math
 import matplotlib.pyplot as plt
 
 x = []
-theta = [random.random() for i in range(4)]
-bias = random.random()
-error = []
+theta = [0.2, 0.2, 0.2, 0.2]
+bias = 0.2
 
-dTeta = []
+dTeta = [0.0 for _ in range(4)]
 dBias = 0.0
 #alpha used : 0.1 and 0.8
-alpha = 0.1 
+alpha = 0.8
 prediksi = []
+prediciton_result = []
+kelas = []
+training = []
+valid = []
 
 #read data from csv
 def readData():
-	with open('irisdata.csv') as openCsv:
+	with open('irisdataholdout.data') as openCsv:
 		data = csv.reader(openCsv)
-		for row in range(data):
-			x.append([float(row[0]), float(row[1]), float(row[0]), float(row[3])])
-			kelas.append(0 if i[4] == 'Iris-setosa' else 1)
+		for row in data:
+			x.append([float(row[i]) for i in range(len(row)-1)])
+			kelas.append(0 if row[4] == 'Iris-setosa' else 1)
 
 #target function h
-def target_function(x, theta, bias):
+def target_function(xi, thetai, biasi):
 	res = 0.0
 	for i in range(4):
-		res += x[i] * theta[i]
-	res += bias
+		res += xi[i] * thetai[i]
+	res += biasi
 	return res
 
 #error function
 def error_function(prediction, fact):
-	return (prediction - fact) ** 2
+	return (fact - prediction) ** 2
 
 #activation function
 def sigmoid_h(h):
     return 1 / (1 + math.exp(-1.0 * h))
 
-def delta_theta(prediction, fact, x):
-	return 2 * (prediction - fact) * (1 - fact) * fact * x
+def delta_theta(prediction, fact, xtmp):
+	return 2 * (fact - prediction) * (1 - prediction) * prediction * xtmp
 
 
 def delta_bias(prediction, fact):
-	return 2 * (prediction - fact) * (1 - fact) * fact
+	return 2 * (fact - prediction) * (1 - prediction) * prediction
 
-def update_theta(tetaI, deltaT):
-	return tetaI - (alpha * deltaT)
+def update_theta(xi, pred, fact):
+	for i in range(4):
+		theta[i] += alpha * delta_theta(pred, fact, xi[i])
 
-def update_bias(deltaBias):
-	return bias + (alpha * deltaBias)
+def update_bias(prediction, fact):
+	global bias
+	bias += alpha * delta_bias(prediction, fact)
 
-def start():
+def update_function(xi, prediction, fact):
+	update_theta(xi, prediction, fact)
+	update_bias(prediction, fact)
+
+def train():
+	error = 0.0
+	for i in range(100):
+		total = target_function(x[i], theta, bias)
+		pred = sigmoid_h(total)
+		error += error_function(pred, kelas[i])
+		update_function(x[i], pred, kelas[i])
+	return error / 100
+
+def plot_err(*print_data):
+	for data in print_data:
+		plt.plot(data[0], label = data[1])
+	plt.legend(loc = 'upper right')
+	plt.xlabel('Epoch')
+	plt.ylabel('Error')
+	plt.show()
+
+def start_train():
+	# global x, theta, bias
 	for epoch in range(60):
-		for i in range(100):
-			h = target_function(x, theta, bias)
-			sig = sigmoid_h(h)
-			err = error_function(sig, kelas[i]);
-			error.append(err)
-			prediksi.append(0 if err < 0.5 else 1)
-			#tetaBaru = []
-			for j in range(4):
-				dTeta[j] = delta_theta(sig, kelas[i], x[j])
-				theta[j] = update_theta(theta[j], dTeta[j])
-			dBias = delta_bias(sig, kelas[i])
-			bias = update_bias(dBias)
+		training.append(train())
+	plot_err([training, 'Training'])
+		
+
+# def start_validation():
+# 	for i in range(20):
+
 
 
 readData()
-start()
-
-plt.plot(error)
-plt.show()
+start_train()
+# start_validation()
