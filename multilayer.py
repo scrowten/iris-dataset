@@ -7,14 +7,24 @@ import random
 x = []
 h = [0.0, 0.0, 0.0]
 y = 0.0
+inp = 4
+alpha = 0.1
 neuron_in_h1 = 3
 iris_class = []
 epoch = 100
 N = 0
-weight1 = [[random.random() for x in range(4)] for y in range(3)]
-weight2 = [random.random() for x in range(3)]
-bias = [random.random()]
+dweight1 = [[0.0 for i in range(4)] for j in range(3)] 
+weight1 = [[random.random() for i in range(4)] for j in range(3)]
+dweight2 = [0.0 for i in range(3)]
+weight2 = [random.random() for i in range(3)]
+dbias = [0.0 for i in range(3)]
+bias = [random.random() for i in range(3)]
+dbias_ot = [0.0]
 bias_ot = [random.random()]
+tau_mid = [0.0, 0.0, 0.0]
+tau = 0.0
+train = [0.0 for i in range(5)]
+valid = [0.0 for i in range(5)]
 
 def read_data():
     global N
@@ -24,18 +34,18 @@ def read_data():
             x.append([float(row[i]) for i in range(len(row) - 1)])
             if (row[4] == 'Iris-setosa'):
                 iris_class.append(0)
-            elif (row[4] == 'Iris-versicolor')
+            elif (row[4] == 'Iris-versicolor'):
                 iris_class.append(1)
             else:
                 iris_class.append(2)
     N = len(iris_class)
     
 
-def target_function(x, weight, bias):
+def target_function(x, weight, biasi):
     tmp = 0.0
     for i in range(len(x)):
         tmp += (x[i] * weight[i])
-    tmp += bias
+    tmp += biasi
     return tmp
 
 def sigmoid(z):
@@ -47,8 +57,28 @@ def error_function(prediction, target):
 def find_tau(prediction, target):
     return (prediction - target) * (1 - prediction) * prediction
 
+def delta_weight():
+    return a
+
+def delta_bias():
+    return b
+
+#def start_over():
+
+
+def ploter(*print_data):
+    for data in print_data:
+        plt.plot(data[0], label = data[1])
+    plt.legend(loc = 'upper right')
+    plt.xlabel('Epoch')
+    plt.ylabel('Error')
+    plt.show
+
+
 def training():
+    global bias, bias_ot
     for k_fold in range(1):
+        #start_over()
         head = 30 * k_fold
         tail = 30 * (k_fold + 1)    
         for ep in range(epoch):
@@ -56,32 +86,64 @@ def training():
             err = 0.0
             for number_data in range(0, head, 1):
                 for i in range(neuron_in_h1):
-                    h[i] = sigmoid(target_function(x[number_data], weight1[i]), bias[i])
+                    h[i] = sigmoid(target_function(x[number_data], weight1[i], bias[i]))
                 y = sigmoid(target_function(h, weight2, bias_ot))
                 err += error_function(y, iris_class[number_data])
                 # regularization
                 tau = find_tau(y, iris_class[number_data])
-                
+                dbias_ot = tau * 1
+                bias_ot = bias_ot - (alpha * dbias_ot)
+                for i in range(neuron_in_h1):
+                    dweight2[i] = tau * h[i]
+                    tau_mid[i] = (tau * weight2[i]) * h[i] * (1 - h[i])
+                    dbias[i] = tau_mid[i]
+                    bias[i] = bias[i] - (alpha * dbias[i])
+                    for j in range(inp):
+                        dweight1[i][j] = tau_mid[i] * x[j]
+                        weight1[i][j] = weight1[i][j] - (alpha * dweight1[i][j])
+            #train[ep].append(err / )                
             for number_data in range(tail, N, 1):
                 for i in range(neuron_in_h1):
-                    h[i] = sigmoid(target_function(x[number_data], weight1[i]), bias[i])
+                    h[i] = sigmoid(target_function(x[number_data], weight1[i], bias[i]))
                 y = sigmoid(target_function(h, weight2, bias_ot))
                 regularization(y, iris_class[number_data])
                 err += error_function(y, iris_class[number_data])
-            error.append(err / 120.0)
-            
-            #validation
-            err = 0.0
-            for number_data in range(head, tail, 1):
+                # regularization
+                tau = find_tau(y, iris_class[number_data])
                 for i in range(neuron_in_h1):
-                    h[i] = sigmoid(target_function(x[number_data], weight1[i]), bias[i])
-                y = sigmoid(target_function(h, weight2, bias_ot))
-                regularization()
-                err += error_function(y, iris_class[number_data])
-            err
-
+                    dweight2[i] = tau * h[i]
+                    tau_mid[i] = (tau * weight2[i]) * h[i] * (1 - h[i])
+                    dbias[i] = tau_mid[i]
+                    bias[i] = bias[i] - (alpha * dbias[i])
+                    for j in range(inp):
+                        dweight1[i][j] = tau_mid[i] * x[j]
+                        weight1[i][j] = weight1[i][j] - (alpha * dweight1[i][j])
+            train[ep].append(err / 120.0)
+            #validation
+            # err = 0.0
+            # for i in range(neuron_in_h1):
+            #         h[i] = sigmoid(target_function(x[number_data], weight1[i]), bias[i])
+            #     y = sigmoid(target_function(h, weight2, bias_ot))
+            #     regularization(y, iris_class[number_data])
+            #     err += error_function(y, iris_class[number_data])
+            #     # regularization
+            #     tau = find_tau(y, iris_class[number_data])
+            #     for i in range(neuron_in_h1):
+            #         dweight2[i] = tau * h[i]
+            #         tau_mid[i] = (tau * weight2[i]) * h[i] * (1 - h[i])
+            #         dbias[i] = tau_mid[i]
+            #         bias[i] = bias[i] - (alpha * dbias[i])
+            #         for j in range(inp):
+            #             dweight1[i][j] = tau_mid[i] * x[j]
+            #             weight1[i][j] = weight1[i][j] - (alpha * dweight1[i][j])
+            # valid[ep].append(err / 120.0)
+        ploter([train[k_fold], 'Training'])#, [valid[i], 'Validation'])
+        
 
 
 
 read_data()
-training()
+# training()
+# for i in range(3):
+print(bias[0])
+# print(iris_class)
