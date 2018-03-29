@@ -72,7 +72,7 @@ def ploter(*print_d):
     plt.legend(loc = 'upper right')
     plt.xlabel('Epoch')
     plt.ylabel('Error')
-    plt.show
+    plt.show()
 
 def training():
     global bias_ot
@@ -145,8 +145,6 @@ def training():
         # # print("Validation")
         print(valid)
         
-
-
 
 read_data()
 training()
