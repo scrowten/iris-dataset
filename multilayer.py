@@ -14,17 +14,17 @@ iris_class = []
 epoch = 100
 N = 0
 dweight1 = [[0.0 for i in range(4)] for j in range(3)] 
-weight1 = [[random.random() for i in range(4)] for j in range(3)]
+weight1 = [[0.3 for i in range(4)] for j in range(3)]
 dweight2 = [0.0 for i in range(3)]
-weight2 = [random.random() for i in range(3)]
+weight2 = [0.3 for i in range(3)]
 dbias = [0.0 for i in range(3)]
-bias = [random.random() for i in range(3)]
+bias = [0.3 for i in range(3)]
 dbias_ot = 0.0
-bias_ot = random.random()
+bias_ot = 0.3
 tau_mid = [0.0, 0.0, 0.0]
 tau = 0.0
-train = []
-valid = []
+train = [0.0 for i in range(100)]
+valid = [0.0 for i in range(100)]
 
 def read_data():
     global N
@@ -52,7 +52,7 @@ def sigmoid(z):
     return 1 / (1 + math.exp(-1.0 * z))
 
 def error_function(prediction, target):
-    return 0.5 * (prediction - target) ** 2
+    return 0.5 * ((prediction - target) ** 2)
 
 def find_tau(prediction, target):
     return (prediction - target) * (1 - prediction) * prediction
@@ -66,11 +66,11 @@ def delta_bias():
 def start_over():
     for i in range(3):
         for j in range(4):
-            weight1[i][j] = random.random()
+            weight1[i][j] = 0.1
     for i in range(3):
-        weight2[i] = random.random()
-        bias = random.random()
-    bias_ot = random.random()
+        weight2[i] = 0.1
+        bias = 0.1
+    bias_ot = 0.1
 
 
 def ploter(*print_d):
@@ -86,7 +86,8 @@ def training():
     for k_fold in range(5):
         start_over()
         head = 30 * k_fold
-        tail = 30 * (k_fold + 1)    
+        tail = 30 * (k_fold + 1)
+        #print(0, head, tail, N, "\n")
         for ep in range(epoch):
             #training
             err = 0.0
@@ -97,12 +98,12 @@ def training():
                 err += error_function(y, iris_class[number_data])
                 # regularization
                 tau = find_tau(y, iris_class[number_data])
-                dbias_ot = tau * 1
+                dbias_ot = tau * 1.0
                 bias_ot = bias_ot - (alpha * dbias_ot)
                 for i in range(neuron_in_h1):
                     dweight2[i] = tau * h[i]
-                    tau_mid[i] = (tau * weight2[i]) * h[i] * (1 - h[i])
-                    dbias[i] = tau_mid[i]
+                    tau_mid[i] = (tau * weight2[i]) * h[i] * (1.0 - h[i])
+                    dbias[i] = tau_mid[i] * 1.0
                     bias[i] = bias[i] - (alpha * dbias[i])
                     for j in range(inp):
                         dweight1[i][j] = tau_mid[i] * x[i][j]
@@ -116,15 +117,17 @@ def training():
                 err += error_function(y, iris_class[number_data])
                 # regularization
                 tau = find_tau(y, iris_class[number_data])
+                dbias_ot = tau * 1.0
+                bias_ot = bias_ot - (alpha * dbias_ot)
                 for i in range(neuron_in_h1):
                     dweight2[i] = tau * h[i]
-                    tau_mid[i] = (tau * weight2[i]) * h[i] * (1 - h[i])
+                    tau_mid[i] = (tau * weight2[i]) * h[i] * (1.0 - h[i])
                     dbias[i] = tau_mid[i]
                     bias[i] = bias[i] - (alpha * dbias[i])
                     for j in range(inp):
                         dweight1[i][j] = tau_mid[i] * x[i][j]
                         weight1[i][j] = weight1[i][j] - (alpha * dweight1[i][j])
-            train.append(err / 120.0)
+            train[ep] = (err / 120.0)
             #print(err / 120)
             #validation
             err = 0.0
@@ -136,21 +139,23 @@ def training():
                 err += error_function(y, iris_class[number_data])
                 # regularization
                 tau = find_tau(y, iris_class[number_data])
+                dbias_ot = tau * 1.0
+                bias_ot = bias_ot - (alpha * dbias_ot)
                 for i in range(neuron_in_h1):
                     dweight2[i] = tau * h[i]
-                    tau_mid[i] = (tau * weight2[i]) * h[i] * (1 - h[i])
+                    tau_mid[i] = (tau * weight2[i]) * h[i] * (1.0 - h[i])
                     dbias[i] = tau_mid[i]
                     bias[i] = bias[i] - (alpha * dbias[i])
                     for j in range(inp):
                         dweight1[i][j] = tau_mid[i] * x[i][j]
                         weight1[i][j] = weight1[i][j] - (alpha * dweight1[i][j])
-            valid.append(err / 30.0)
+            valid[ep] = (err / 30.0)
             #print(err / 30)
         ploter([train, 'Training'], [valid, 'Validation'])
         # # print("Training"
-        print(train)
+        #print(train)
         # # print("Validation")
-        print(valid)
+        # print(valid)
         
 
 read_data()

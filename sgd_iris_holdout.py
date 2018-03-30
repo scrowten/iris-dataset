@@ -91,7 +91,7 @@ def start_train_val():
 	for epoch in range(60):
 		training.append(train())
 		valid.append(val())
-	plot_err([training, 'Training'], [valid, 'Validation'])
+	plot_err([training, 'Training'])#, [valid, 'Validation'])
 		
 
 # def start_validation():
