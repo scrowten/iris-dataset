@@ -63,7 +63,14 @@ def delta_weight():
 def delta_bias():
     return b
 
-#def start_over():
+def start_over():
+    for i in range(3):
+        for j in range(4):
+            weight1[i][j] = random.random()
+    for i in range(3):
+        weight2[i] = random.random()
+        bias = random.random()
+    bias_ot = random.random()
 
 
 def ploter(*print_d):
@@ -77,7 +84,7 @@ def ploter(*print_d):
 def training():
     global bias_ot
     for k_fold in range(5):
-        #start_over()
+        start_over()
         head = 30 * k_fold
         tail = 30 * (k_fold + 1)    
         for ep in range(epoch):
