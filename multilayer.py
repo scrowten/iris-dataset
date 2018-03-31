@@ -102,6 +102,7 @@ def training():
                 bias_ot = bias_ot - (alpha * dbias_ot)
                 for i in range(neuron_in_h1):
                     dweight2[i] = tau * h[i]
+                    weight2[i] = weight2[i] - (alpha * dweight2[i])
                     tau_mid[i] = (tau * weight2[i]) * h[i] * (1.0 - h[i])
                     dbias[i] = tau_mid[i] * 1.0
                     bias[i] = bias[i] - (alpha * dbias[i])
@@ -121,6 +122,7 @@ def training():
                 bias_ot = bias_ot - (alpha * dbias_ot)
                 for i in range(neuron_in_h1):
                     dweight2[i] = tau * h[i]
+                    weight2[i] = weight2[i] - (alpha * dweight2[i])
                     tau_mid[i] = (tau * weight2[i]) * h[i] * (1.0 - h[i])
                     dbias[i] = tau_mid[i]
                     bias[i] = bias[i] - (alpha * dbias[i])
@@ -143,6 +145,7 @@ def training():
                 bias_ot = bias_ot - (alpha * dbias_ot)
                 for i in range(neuron_in_h1):
                     dweight2[i] = tau * h[i]
+                    weight2[i] = weight2[i] - (alpha * dweight2[i])
                     tau_mid[i] = (tau * weight2[i]) * h[i] * (1.0 - h[i])
                     dbias[i] = tau_mid[i]
                     bias[i] = bias[i] - (alpha * dbias[i])
